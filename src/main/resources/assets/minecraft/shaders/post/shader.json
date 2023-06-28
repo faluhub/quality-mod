@@ -1,0 +1,21 @@
+{
+    "targets": [
+        "swap"
+    ],
+    "passes": [
+        {
+            "name": "jpeg_pass2",
+            "intarget": "minecraft:main",
+            "outtarget": "swap",
+            "uniforms": [
+                { "name": "Saturation", "values": [ 1.0 ] },
+                { "name": "Quality", "values": [ 8.0 ] }
+            ]
+        },
+        {
+            "name": "jpeg_pass1",
+            "intarget": "swap",
+            "outtarget": "minecraft:main"
+        }
+    ]
+}

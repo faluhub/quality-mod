@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.falu.minecraftbutthevideoqualityequalsyourhealth.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "access.PostEffectProcessorAccessor",
+    "access.SoundManagerAccessor",
+    "access.SoundSystemAccessor",
+    "access.SourceAccessor",
+
+    "GameRendererMixin",
+    "MinecraftClientMixin",
+    "SourceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

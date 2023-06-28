@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "minecraftbutthevideoqualityequalsyourhealth",
+  "version": "${version}",
+  "name": "MinecraftButTheVideoQualityEqualsYourHealth",
+  "description": "Minecraft, but the video quality equals your HEALTH...",
+  "authors": ["falu"],
+  "contact": {
+    "homepage": "https://github.com/faluhub"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "me.falu.minecraftbutthevideoqualityequalsyourhealth.QualityMod"
+    ]
+  },
+  "mixins": ["minecraftbutthevideoqualityequalsyourhealth.mixins.json"],
+  "accessWidener": "minecraftbutthevideoqualityequalsyourhealth.accesswidener",
+  "depends": {
+    "minecraft": "1.19.4"
+  }
+}
