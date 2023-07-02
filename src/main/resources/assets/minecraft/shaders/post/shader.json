@@ -9,7 +9,8 @@
             "outtarget": "swap",
             "uniforms": [
                 { "name": "Saturation", "values": [ 1.0 ] },
-                { "name": "Quality", "values": [ 8.0 ] }
+                { "name": "Quality", "values": [ 8.0 ] },
+                { "name": "Hue", "values": [ 1.0 ] }
             ]
         },
         {

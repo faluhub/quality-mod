@@ -17,10 +17,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
+    private static final Random RANDOM = new Random();
     private static final Identifier SHADER = new Identifier("shaders/post/shader.json");
+    private static float HUE = RANDOM.nextFloat();
     private float lastHealth = -1.0F;
     private int lastFpsValue = -1;
     @Shadow @Nullable PostEffectProcessor postProcessor;
@@ -52,6 +55,9 @@ public abstract class GameRendererMixin {
     private void addShader(CallbackInfo ci) {
         this.postProcessorEnabled = true;
         if (this.client.player == null) { return; }
+        for (Uniform uniform : this.getUniform("Hue")) {
+            uniform.set(HUE);
+        }
         float health = this.client.player.getHealth();
         if (health <= 0.0F) {
             if (QualityMod.GRAYSCALE_DEATH) {
@@ -69,6 +75,7 @@ public abstract class GameRendererMixin {
             this.lastHealth = -1.0F;
             this.client.options.getMaxFps().setValue(QualityMod.DEFAULT_FPS_VAL);
             this.lastFpsValue = QualityMod.DEFAULT_FPS_VAL;
+            HUE = RANDOM.nextFloat();
             return;
         }
         float maxHealth = this.client.player.getMaxHealth();

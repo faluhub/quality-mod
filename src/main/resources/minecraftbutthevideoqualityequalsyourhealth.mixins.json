@@ -11,7 +11,7 @@
 
     "GameRendererMixin",
     "MinecraftClientMixin",
-    "SourceMixin"
+    "SoundSystemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
