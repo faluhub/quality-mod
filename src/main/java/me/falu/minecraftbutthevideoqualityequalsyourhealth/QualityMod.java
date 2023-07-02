@@ -2,6 +2,7 @@ package me.falu.minecraftbutthevideoqualityequalsyourhealth;
 
 import io.obswebsocket.community.client.OBSRemoteController;
 import io.obswebsocket.community.client.OBSRemoteControllerBuilder;
+import me.falu.minecraftbutthevideoqualityequalsyourhealth.listener.ResetListener;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -9,15 +10,20 @@ import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class QualityMod implements ClientModInitializer {
     public static final ModContainer MOD_CONTAINER = FabricLoader.getInstance().getModContainer("minecraftbutthevideoqualityequalsyourhealth").orElseThrow(RuntimeException::new);
     public static final String MOD_NAME = MOD_CONTAINER.getMetadata().getName();
     public static final String MOD_VERSION = String.valueOf(MOD_CONTAINER.getMetadata().getVersion());
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
-    private static OBSRemoteController CONTROLLER;
-    private static boolean CONTROLLER_CONNECTED = false;
+    public static OBSRemoteController CONTROLLER;
+    public static boolean CONTROLLER_CONNECTED = false;
+    public static final List<ResetListener> LISTENERS = new ArrayList<>();
 
     public static int POWER;
+    public static int OFFSET;
     public static int LOWEST_FPS_VAL;
     public static int DEFAULT_FPS_VAL;
     public static int WEBSOCKET_PORT;
@@ -33,6 +39,7 @@ public class QualityMod implements ClientModInitializer {
 
     public static void setConfigValues() {
         POWER = ConfigHandler.getIntValue("power", 2);
+        OFFSET = ConfigHandler.getIntValue("offset", 0);
         LOWEST_FPS_VAL = ConfigHandler.getIntValue("lowest_fps_val", 10);
         DEFAULT_FPS_VAL = ConfigHandler.getIntValue("default_fps_val", 120);
         WEBSOCKET_PORT = ConfigHandler.getIntValue("websocket_port", 4444);

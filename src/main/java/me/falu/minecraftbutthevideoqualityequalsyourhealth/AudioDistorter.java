@@ -41,6 +41,7 @@ public class AudioDistorter {
             EXTEfx.alEffecti(DISTORTION, EXTEfx.AL_EFFECT_TYPE, EXTEfx.AL_EFFECT_DISTORTION);
             this.checkError();
         }
+        if (SLOT == -1 || DISTORTION == -1) { return; }
 
         float x = this.client.player.getHealth();
         double y;
@@ -49,8 +50,6 @@ public class AudioDistorter {
         else { y = 1.0 + 5.0D - x / 2.0D / 10.0D * 5.0D; }
         double value = y / 10.0D;
         value = Math.min(1.0D, Math.max(value, 0.01D));
-
-        if (SLOT == -1 || DISTORTION == -1) { return; }
 
         EXTEfx.alEffectf(DISTORTION, EXTEfx.AL_DISTORTION_EDGE, (float) value);
         this.checkError();

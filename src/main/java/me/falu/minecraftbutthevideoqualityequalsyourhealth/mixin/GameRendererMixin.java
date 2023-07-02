@@ -1,6 +1,7 @@
 package me.falu.minecraftbutthevideoqualityequalsyourhealth.mixin;
 
 import me.falu.minecraftbutthevideoqualityequalsyourhealth.QualityMod;
+import me.falu.minecraftbutthevideoqualityequalsyourhealth.listener.ResetListener;
 import me.falu.minecraftbutthevideoqualityequalsyourhealth.mixin.access.PostEffectProcessorAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.PostEffectPass;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 @Mixin(GameRenderer.class)
-public abstract class GameRendererMixin {
+public abstract class GameRendererMixin implements ResetListener {
     private static final Random RANDOM = new Random();
     private static final Identifier SHADER = new Identifier("shaders/post/shader.json");
     private static float HUE = RANDOM.nextFloat();
@@ -31,24 +32,21 @@ public abstract class GameRendererMixin {
     @Shadow @Final MinecraftClient client;
     @Shadow private boolean postProcessorEnabled;
 
-    private List<Uniform> getUniform(String uniformName) {
+    @Override
+    public void onReset() {
+        this.lastHealth = -1.0F;
+        this.lastFpsValue = -1;
+        HUE = RANDOM.nextFloat();
         if (this.postProcessor != null) {
-            if (this.postProcessor.getName().equals(SHADER.toString())) {
-                List<Uniform> list = new ArrayList<>();
-                List<PostEffectPass> passes = ((PostEffectProcessorAccessor) this.postProcessor).getPasses();
-                for (PostEffectPass pass : passes) {
-                    Uniform uniform = pass.getProgram().getUniformByName(uniformName);
-                    if (uniform != null) {
-                        list.add(uniform);
-                    }
-                }
-                return list;
-            }
             this.postProcessor.close();
             this.postProcessor = null;
         }
-        this.loadPostProcessor(SHADER);
-        return this.getUniform(uniformName);
+        QualityMod.setMicLevels();
+    }
+
+    @Inject(method = "<init>*", at = @At("TAIL"))
+    private void registerListener(CallbackInfo ci) {
+        this.register(this);
     }
 
     @Inject(method = "render", at = @At("HEAD"))
@@ -81,7 +79,7 @@ public abstract class GameRendererMixin {
         float maxHealth = this.client.player.getMaxHealth();
         if (this.lastHealth == -1.0F || this.lastHealth != health) {
             QualityMod.setMicLevels();
-            float value = (float) Math.pow((maxHealth - health) / 10.0D, QualityMod.POWER) * QualityMod.INTENSITY_FACTOR;
+            float value = (float) Math.pow((QualityMod.OFFSET + maxHealth - health) / 10.0D, QualityMod.POWER) * QualityMod.INTENSITY_FACTOR;
             value = Math.max(1.0F, value);
             int fpsValue = Math.max(Math.max(QualityMod.LOWEST_FPS_VAL, 10), (int) (QualityMod.DEFAULT_FPS_VAL / maxHealth * health));
             for (Uniform uniform : this.getUniform("Saturation")) {
@@ -102,5 +100,25 @@ public abstract class GameRendererMixin {
     @Inject(method = "onCameraEntitySet", at = @At("HEAD"), cancellable = true)
     private void removePostShaders(CallbackInfo ci) {
         ci.cancel();
+    }
+
+    private List<Uniform> getUniform(String uniformName) {
+        if (this.postProcessor != null) {
+            if (this.postProcessor.getName().equals(SHADER.toString())) {
+                List<Uniform> list = new ArrayList<>();
+                List<PostEffectPass> passes = ((PostEffectProcessorAccessor) this.postProcessor).getPasses();
+                for (PostEffectPass pass : passes) {
+                    Uniform uniform = pass.getProgram().getUniformByName(uniformName);
+                    if (uniform != null) {
+                        list.add(uniform);
+                    }
+                }
+                return list;
+            }
+            this.postProcessor.close();
+            this.postProcessor = null;
+        }
+        this.loadPostProcessor(SHADER);
+        return this.getUniform(uniformName);
     }
 }
