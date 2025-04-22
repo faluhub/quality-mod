@@ -13,30 +13,30 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin implements ResetListener {
-    private static final Random RANDOM = new Random();
-    private static final Identifier SHADER = new Identifier("shaders/post/shader.json");
-    private static float HUE = RANDOM.nextFloat();
-    private float lastHealth = -1.0F;
-    private int lastFpsValue = -1;
+    @Unique private static final Identifier SHADER = new Identifier("shaders/post/shader.json");
+    @Unique private float lastHealth = -1.0F;
+    @Unique private int lastFpsValue = -1;
     @Shadow @Nullable PostEffectProcessor postProcessor;
-    @Shadow abstract void loadPostProcessor(Identifier id);
     @Shadow @Final MinecraftClient client;
     @Shadow private boolean postProcessorEnabled;
 
+    @Shadow
+    abstract void loadPostProcessor(Identifier id);
+
     @Override
-    public void onReset() {
+    public void minecraftbutthevideoqualityequalsyourhealth$onReset() {
         this.lastHealth = -1.0F;
         this.lastFpsValue = -1;
-        HUE = RANDOM.nextFloat();
         if (this.postProcessor != null) {
             this.postProcessor.close();
             this.postProcessor = null;
@@ -52,9 +52,8 @@ public abstract class GameRendererMixin implements ResetListener {
     @Inject(method = "render", at = @At("HEAD"))
     private void addShader(CallbackInfo ci) {
         this.postProcessorEnabled = true;
-        if (this.client.player == null) { return; }
-        for (Uniform uniform : this.getUniform("Hue")) {
-            uniform.set(HUE);
+        if (this.client.player == null) {
+            return;
         }
         float health = this.client.player.getHealth();
         if (health <= 0.0F) {
@@ -67,13 +66,12 @@ public abstract class GameRendererMixin implements ResetListener {
                     uniform.set(1.0F);
                 }
             }
-            for (Uniform uniform : this.getUniform( "Quality")) {
+            for (Uniform uniform : this.getUniform("Quality")) {
                 uniform.set(8.0F);
             }
             this.lastHealth = -1.0F;
             this.client.options.getMaxFps().setValue(QualityMod.DEFAULT_FPS_VAL);
             this.lastFpsValue = QualityMod.DEFAULT_FPS_VAL;
-            HUE = RANDOM.nextFloat();
             return;
         }
         float maxHealth = this.client.player.getMaxHealth();
@@ -102,6 +100,7 @@ public abstract class GameRendererMixin implements ResetListener {
         ci.cancel();
     }
 
+    @Unique
     private List<Uniform> getUniform(String uniformName) {
         if (this.postProcessor != null) {
             if (this.postProcessor.getName().equals(SHADER.toString())) {

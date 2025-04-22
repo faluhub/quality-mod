@@ -14,8 +14,10 @@ import java.util.concurrent.CompletableFuture;
 public class MinecraftClientMixin {
     @Inject(method = "reloadResources()Ljava/util/concurrent/CompletableFuture;", at = @At("TAIL"))
     private void updateConfig(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-        if (!QualityMod.CONTROLLER_CONNECTED) { QualityMod.CONTROLLER.connect(); }
+        if (!QualityMod.CONTROLLER_CONNECTED) {
+            QualityMod.CONTROLLER.connect();
+        }
         QualityMod.setConfigValues();
-        QualityMod.LISTENERS.forEach(ResetListener::onReset);
+        QualityMod.LISTENERS.forEach(ResetListener::minecraftbutthevideoqualityequalsyourhealth$onReset);
     }
 }

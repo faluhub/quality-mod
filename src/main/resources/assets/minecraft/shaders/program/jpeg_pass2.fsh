@@ -11,18 +11,11 @@ in vec2 oneTexel;
 uniform vec2 InSize;
 uniform float Saturation;
 uniform float Quality = length(vec2(2));
-uniform float Hue;
 
 out vec4 fragColor;
 
 const float PI = radians(180.0);
 const float BSf = float(BS);
-
-vec3 hueShift(vec3 color) {
-    const vec3 k = vec3(0.57735, 0.57735, 0.57735);
-    float cosAngle = cos(Hue);
-    return vec3(color * cosAngle + cross(k, color) * sin(Hue) + k * dot(k, color) * (1.0 - cosAngle));
-}
 
 float basis1D(int k, int i) {
     return k == 0 ? sqrt(1. / BSf) : sqrt(2. / BSf) * cos(float((2 * i + 1) * k) * PI / (2. * BSf));
@@ -63,5 +56,4 @@ void main() {
             fragColor += InTexel * basis2D(inBlock, xy) / BS;
         }
     }
-    fragColor = vec4(hueShift(fragColor.rgb), 1.0);
 }

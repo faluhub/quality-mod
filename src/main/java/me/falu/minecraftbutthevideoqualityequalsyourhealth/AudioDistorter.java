@@ -12,6 +12,9 @@ import org.lwjgl.openal.EXTEfx;
 /**
  * Mostly based off of <a href="https://github.com/vic4games/weaponlib/blob/c391fccbc0e0e7e47df150504541eae322e98cd3/src/main/java/com/vicmatskiv/weaponlib/compatibility/CoreSoundInterceptor.java">this class</a>.
  * Also used <a href="https://openal-soft.org/misc-downloads/Effects%20Extension%20Guide.pdf">this document</a> as a reference.
+ * <p>
+ * Like none of this is documented and it pissed me off so much. I hope this is useful to someone who needs to do the same.
+ * If you end up using this, please dm me on Discord or something and credit me. I'm curious.
  */
 public class AudioDistorter {
     public static final AudioDistorter INSTANCE = new AudioDistorter();
@@ -21,12 +24,18 @@ public class AudioDistorter {
     private int errorIndex = 0;
 
     public void applyValue(int source) {
-        if (!QualityMod.DEEPFRY_AUDIO) { return; }
+        if (!QualityMod.DEEPFRY_AUDIO) {
+            return;
+        }
 
-        if (this.client.player == null || this.client.isPaused()) { return; }
+        if (this.client.player == null || this.client.isPaused()) {
+            return;
+        }
 
         SoundSystem system = ((SoundManagerAccessor) this.client.getSoundManager()).getSoundSystem();
-        if (system == null || !((SoundSystemAccessor) system).getStarted()) { return; }
+        if (system == null || !((SoundSystemAccessor) system).getStarted()) {
+            return;
+        }
         this.errorIndex = 0;
 
         if (SLOT == -1) {
@@ -41,13 +50,19 @@ public class AudioDistorter {
             EXTEfx.alEffecti(DISTORTION, EXTEfx.AL_EFFECT_TYPE, EXTEfx.AL_EFFECT_DISTORTION);
             this.checkError();
         }
-        if (SLOT == -1 || DISTORTION == -1) { return; }
+        if (SLOT == -1 || DISTORTION == -1) {
+            return;
+        }
 
         float x = this.client.player.getHealth();
         double y;
-        if (x <= 1.0F && x > 0.0F) { y = 7.5D; }
-        else if (x <= 0.0F || x / this.client.player.getMaxHealth() * 100.0D > QualityMod.HEALTH_PERCENTAGE_UNTIL_EARRAPE) { y = 0.0D; }
-        else { y = 1.0 + 5.0D - x / 2.0D / 10.0D * 5.0D; }
+        if (x <= 1.0F && x > 0.0F) {
+            y = 7.5D;
+        } else if (x <= 0.0F || x / this.client.player.getMaxHealth() * 100.0D > QualityMod.HEALTH_PERCENTAGE_UNTIL_EARRAPE) {
+            y = 0.0D;
+        } else {
+            y = 1.0 + 5.0D - x / 2.0D / 10.0D * 5.0D;
+        }
         double value = y / 10.0D;
         value = Math.min(1.0D, Math.max(value, 0.01D));
 

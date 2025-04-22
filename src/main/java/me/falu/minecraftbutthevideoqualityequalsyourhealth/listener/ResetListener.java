@@ -9,5 +9,5 @@ public interface ResetListener {
         }
     }
 
-    void onReset();
+    void minecraftbutthevideoqualityequalsyourhealth$onReset();
 }

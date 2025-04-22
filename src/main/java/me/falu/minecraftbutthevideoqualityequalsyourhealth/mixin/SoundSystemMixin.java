@@ -8,15 +8,18 @@ import net.minecraft.client.sound.SoundSystem;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 @Mixin(SoundSystem.class)
 public class SoundSystemMixin {
     @Shadow @Final private Map<SoundInstance, Channel.SourceManager> sources;
 
+    @Unique
     private void addFilterToManager(Channel.SourceManager manager) {
         manager.run(source -> AudioDistorter.INSTANCE.applyValue(((SourceAccessor) source).getPointer()));
     }

@@ -8,7 +8,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 
 import net.minecraft.client.MinecraftClient;
-import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,7 @@ public class QualityMod implements ClientModInitializer {
     public static final String MOD_VERSION = String.valueOf(MOD_CONTAINER.getMetadata().getVersion());
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
     public static OBSRemoteController CONTROLLER;
-    public static boolean CONTROLLER_CONNECTED = false;
+    public static boolean CONTROLLER_CONNECTED;
     public static final List<ResetListener> LISTENERS = new ArrayList<>();
 
     public static int POWER;
@@ -35,7 +37,9 @@ public class QualityMod implements ClientModInitializer {
     public static String BAD_MIC_SOURCE_NAME;
     public static String WEBSOCKET_PASSWORD;
 
-    static { setConfigValues(); }
+    static {
+        setConfigValues();
+    }
 
     public static void setConfigValues() {
         POWER = ConfigHandler.getIntValue("power", 2);
@@ -58,11 +62,15 @@ public class QualityMod implements ClientModInitializer {
 
     public static void setMicLevels() {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (!CONTROLLER_CONNECTED || client.player == null) { return; }
+        if (!CONTROLLER_CONNECTED || client.player == null) {
+            return;
+        }
         float health = client.player.getHealth();
         float threshold = 10.0F;
-        CONTROLLER.setInputMute(GOOD_MIC_SOURCE_NAME, health <= threshold, resp -> {});
-        CONTROLLER.setInputMute(BAD_MIC_SOURCE_NAME, health > threshold, resp -> {});
+        CONTROLLER.setInputMute(GOOD_MIC_SOURCE_NAME, health <= threshold, resp -> {
+        });
+        CONTROLLER.setInputMute(BAD_MIC_SOURCE_NAME, health > threshold, resp -> {
+        });
     }
 
     @Override
@@ -71,21 +79,27 @@ public class QualityMod implements ClientModInitializer {
         CONTROLLER = new OBSRemoteControllerBuilder()
                 .host("localhost")
                 .port(WEBSOCKET_PORT)
-                .password(WEBSOCKET_PASSWORD.equals("") ? null : WEBSOCKET_PASSWORD)
+                .password(WEBSOCKET_PASSWORD.isEmpty() ? null : WEBSOCKET_PASSWORD)
                 .connectionTimeout(3)
                 .lifecycle()
-                    .onReady(() -> CONTROLLER_CONNECTED = true)
-                    .onDisconnect(() -> CONTROLLER_CONNECTED = false)
-                    .onClose(code -> CONTROLLER_CONNECTED = false)
-                    .onControllerError(t -> {
-                        try { throw t.getThrowable(); }
-                        catch (Throwable e) { throw new RuntimeException(e); }
-                    })
-                    .onCommunicatorError(t -> {
-                        try { throw t.getThrowable(); }
-                        catch (Throwable e) { throw new RuntimeException(e); }
-                    })
-                    .and()
+                .onReady(() -> CONTROLLER_CONNECTED = true)
+                .onDisconnect(() -> CONTROLLER_CONNECTED = false)
+                .onClose(code -> CONTROLLER_CONNECTED = false)
+                .onControllerError(t -> {
+                    try {
+                        throw t.getThrowable();
+                    } catch (Throwable e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .onCommunicatorError(t -> {
+                    try {
+                        throw t.getThrowable();
+                    } catch (Throwable e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .and()
                 .build();
         CONTROLLER.connect();
     }

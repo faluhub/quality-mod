@@ -13,8 +13,11 @@ public class ConfigHandler {
 
     public static void init() {
         if (!FILE.exists()) {
-            try { boolean ignored = FILE.createNewFile(); }
-            catch (IOException e) { throw new RuntimeException(e); }
+            try {
+                boolean ignored = FILE.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         JsonObject config = get(false);
         if (config.has("file")) {
@@ -28,13 +31,16 @@ public class ConfigHandler {
     }
 
     private static JsonObject get(boolean initialise) {
-        if (initialise) { init(); }
+        if (initialise) {
+            init();
+        }
         try {
             FileReader reader = new FileReader(FILE);
             Object obj = JsonParser.parseReader(reader);
             reader.close();
             return JsonNull.INSTANCE.equals(obj) ? new JsonObject() : (JsonObject) obj;
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
 
         return new JsonObject();
     }
@@ -46,7 +52,8 @@ public class ConfigHandler {
             writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(config));
             writer.flush();
             writer.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     private static JsonElement getValue(String key) {
